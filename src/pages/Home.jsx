@@ -4,32 +4,32 @@ const Home = () => {
   const osProjects = [
     {
       name: 'Nuwax',
-      description: '高性能智能体操作系统，支持多模态输入输出，内置完善的插件生态系统。',
+      description: 'High-performance agent operating system with multi-modal input/output support and a comprehensive plugin ecosystem.',
       url: 'https://github.com/nuwax/nuwax'
     },
     {
       name: 'LoopForge',
-      description: '开源Agent运行时框架，专注于工作流编排和复杂任务调度。',
+      description: 'Open-source agent runtime framework focused on workflow orchestration and complex task scheduling.',
       url: 'https://github.com/loopforge/loopforge'
     },
     {
       name: 'Squire',
-      description: '轻量级智能体操作系统，适合边缘设备和嵌入式场景使用。',
+      description: 'Lightweight agent operating system ideal for edge devices and embedded scenarios.',
       url: 'https://github.com/squire-os/squire'
     },
     {
       name: 'Ghost',
-      description: '专注于隐私保护的Agent OS，所有计算都在本地完成，不上传任何数据。',
+      description: 'Privacy-first agent OS with all computation performed locally, no data uploaded to servers.',
       url: 'https://github.com/ghost-os/ghost'
     },
     {
       name: 'OpenClaw Runtime',
-      description: 'OpenClaw官方智能体运行时，支持多协议扩展和跨平台部署。',
+      description: 'Official OpenClaw agent runtime with multi-protocol extension and cross-platform deployment support.',
       url: 'https://openclaw.ai'
     },
     {
       name: 'AgentFlow',
-      description: '可视化Agent工作流操作系统，无需代码即可构建复杂智能体应用。',
+      description: 'Visual agent workflow operating system for building complex agent applications without coding.',
       url: 'https://github.com/agentflow/agentflow'
     }
   ]
@@ -38,16 +38,16 @@ const Home = () => {
     <>
       <section className="hero">
         <div className="container">
-          <h1>Agent OS 行业全景图</h1>
-          <p>全球领先的智能体操作系统资源聚合平台，汇聚最前沿的Agent技术与项目</p>
-          <a href="/navigation" className="cta-button">探索资源导航</a>
+          <h1>Agent OS Landscape</h1>
+          <p>The world's leading resource aggregation platform for agent operating systems, featuring cutting-edge agent technologies and projects.</p>
+          <a href="/navigation" className="cta-button">Explore Resources</a>
         </div>
       </section>
 
       <main>
         <div className="container">
           <section className="section">
-            <h2>主流Agent OS项目</h2>
+            <h2>Leading Agent OS Projects</h2>
             <div className="card-grid">
               {osProjects.map((project, index) => (
                 <div className="card" key={index}>
@@ -62,20 +62,20 @@ const Home = () => {
           </section>
 
           <section className="section">
-            <h2>什么是Agent OS？</h2>
-            <div style={{ maxWidth: '800px', margin: '0 auto', background: '#f8f9fa', padding: '2rem', borderRadius: '12px' }}>
-              <p style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
-                Agent OS（智能体操作系统）是专门为AI智能体设计的底层软件系统，提供智能体运行所需的核心能力：
+            <h2>What is Agent OS?</h2>
+            <div style={{ maxWidth: '800px', margin: '0 auto', background: 'var(--bg-secondary)', padding: '2rem', borderRadius: '12px' }}>
+              <p style={{ marginBottom: '1rem', fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+                An Agent Operating System is a specialized software layer designed specifically for AI agents, providing core capabilities required for agent operation:
               </p>
-              <ul style={{ marginLeft: '2rem', marginBottom: '1rem', lineHeight: '2' }}>
-                <li>🧠 感知与认知能力：支持多模态输入理解和决策生成</li>
-                <li>⚡ 任务调度与执行：高效管理复杂任务队列和工作流</li>
-                <li>🔌 插件扩展系统：通过插件扩展智能体的功能边界</li>
-                <li>🔒 安全与隐私保护：确保智能体行为可控和数据安全</li>
-                <li>🌐 跨平台部署：支持云端、边缘、端侧等多种部署环境</li>
+              <ul style={{ marginLeft: '2rem', marginBottom: '1rem', lineHeight: '2', color: 'var(--text-secondary)' }}>
+                <li>🧠 Perception & cognition: Multi-modal input understanding and decision generation</li>
+                <li>⚡ Task scheduling & execution: Efficient management of complex task queues and workflows</li>
+                <li>🔌 Plugin extension system: Expand agent capabilities through modular plugins</li>
+                <li>🔒 Security & privacy: Ensure controllable agent behavior and data protection</li>
+                <li>🌐 Cross-platform deployment: Support for cloud, edge, and on-device environments</li>
               </ul>
-              <p style={{ fontSize: '1.1rem', fontWeight: '500' }}>
-                随着AI智能体技术的快速发展，Agent OS正在成为AI基础设施的核心组成部分，驱动下一代智能应用的开发与落地。
+              <p style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}>
+                As AI agent technology rapidly evolves, Agent OS is becoming a core component of AI infrastructure, powering the next generation of intelligent applications.
               </p>
             </div>
           </section>
