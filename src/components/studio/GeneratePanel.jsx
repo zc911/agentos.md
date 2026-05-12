@@ -17,6 +17,9 @@ export default function GeneratePanel({ onGenerated }) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generation failed')
+      if (!data.markdown || !data.markdown.trim()) {
+        throw new Error('Generation returned empty result — please try a different description')
+      }
       onGenerated(data.markdown)
     } catch (err) {
       setError(err.message)
