@@ -68,6 +68,9 @@ export async function onRequestPost(context) {
     })
   }
 
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 28000)
+
   let llmResponse
   try {
     llmResponse = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
@@ -85,13 +88,15 @@ export async function onRequestPost(context) {
         max_tokens: 2048,
         temperature: 0.7,
       }),
-      signal: AbortSignal.timeout(28000),
+      signal: controller.signal,
     })
   } catch (err) {
     return new Response(JSON.stringify({ error: 'LLM request timed out or failed' }), {
       status: 502,
       headers: { 'Content-Type': 'application/json' },
     })
+  } finally {
+    clearTimeout(timeoutId)
   }
 
   if (!llmResponse.ok) {
