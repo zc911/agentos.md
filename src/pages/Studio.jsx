@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import GeneratePanel from '../components/studio/GeneratePanel'
+import EditPanel from '../components/studio/EditPanel'
 
 const PHASES = ['generate', 'edit', 'validate', 'export']
 
@@ -37,11 +38,8 @@ export default function Studio() {
           {phase === 'generate' && (
             <GeneratePanel onGenerated={md => { setMarkdown(md); setPhase('edit') }} />
           )}
-
           {phase === 'edit' && (
-            <pre style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: '8px', overflow: 'auto' }}>
-              {markdown}
-            </pre>
+            <EditPanel markdown={markdown} onChange={setMarkdown} />
           )}
         </section>
       </div>
