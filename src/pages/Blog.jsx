@@ -45,7 +45,7 @@ const Blog = () => {
       <div className="container">
         <section className="section">
           <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '3rem', color: '#333' }}>
-            Agent OS 技术博客
+            Agent OS Blog
           </h1>
 
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -55,19 +55,19 @@ const Blog = () => {
                 <div className="date">{post.date}</div>
                 <p className="excerpt">{post.excerpt}</p>
                 <a href={post.url} className="read-more">
-                  阅读全文 →
+                  Read more →
                 </a>
               </div>
             ))}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '3rem', padding: '2rem', background: '#f8f9fa', borderRadius: '12px' }}>
-            <h3 style={{ marginBottom: '1rem' }}>投稿指南</h3>
+            <h3 style={{ marginBottom: '1rem' }}>Write for Us</h3>
             <p style={{ marginBottom: '1rem', color: '#666' }}>
-              欢迎开发者投稿分享Agent OS相关的技术文章、实践经验和项目案例，稿件一经采用将获得丰厚稿酬。
+              We welcome technical articles on Agent OS, agent tooling, and real-world agent deployments. High-quality submissions are published with attribution.
             </p>
             <a href="mailto:zack.mm.chen@gmail.com" style={{ color: '#667eea', fontWeight: '600' }}>
-              查看投稿详情 →
+              Get in touch →
             </a>
           </div>
         </section>

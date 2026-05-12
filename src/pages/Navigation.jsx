@@ -2,7 +2,7 @@ import React from 'react'
 
 const Navigation = () => {
   const resources = {
-    教程文档: [
+    'Tutorials & Docs': [
       {
         name: 'Agent OS 开发入门指南',
         description: '从零开始学习智能体操作系统开发，包含核心概念和基础教程',
@@ -19,7 +19,7 @@ const Navigation = () => {
         url: '#'
       }
     ],
-    开源项目: [
+    'Open Source': [
       {
         name: 'Awesome Agent OS',
         description: '最全的Agent OS相关开源项目汇总，持续更新中',
@@ -36,7 +36,7 @@ const Navigation = () => {
         url: '#'
       }
     ],
-    社区资源: [
+    'Community': [
       {
         name: 'Agent OS Discord 社区',
         description: '全球最大的Agent OS开发者社区，交流技术、分享经验',
@@ -53,7 +53,7 @@ const Navigation = () => {
         url: '#'
       }
     ],
-    开发工具: [
+    'Dev Tools': [
       {
         name: 'Agent Studio',
         description: '可视化Agent开发IDE，支持拖拽式工作流设计',
@@ -77,7 +77,7 @@ const Navigation = () => {
       <div className="container">
         <section className="section">
           <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '3rem', color: '#333' }}>
-            Agent OS 资源导航
+            Agent OS Resources
           </h1>
 
           {Object.entries(resources).map(([category, items], categoryIndex) => (
@@ -99,10 +99,10 @@ const Navigation = () => {
           ))}
 
           <div style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', padding: '2rem', borderRadius: '12px', color: 'white', textAlign: 'center', marginTop: '3rem' }}>
-            <h3 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>资源收录申请</h3>
-            <p style={{ marginBottom: '1rem' }}>如果您有优质的Agent OS相关资源希望被收录，欢迎联系我们提交申请。</p>
+            <h3 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>Submit a Resource</h3>
+            <p style={{ marginBottom: '1rem' }}>Know a great Agent OS resource that should be listed here? Send it our way.</p>
             <a href="mailto:zack.mm.chen@gmail.com" style={{ color: 'white', fontWeight: '600', textDecoration: 'underline' }}>
-              点击提交资源 →
+              Submit a resource →
             </a>
           </div>
         </section>

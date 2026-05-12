@@ -54,7 +54,7 @@ const Home = () => {
                   <h3>{project.name}</h3>
                   <p>{project.description}</p>
                   <a href={project.url} target="_blank" rel="noopener noreferrer">
-                    访问项目 →
+                    Visit project →
                   </a>
                 </div>
               ))}
