@@ -73,7 +73,7 @@ export async function onRequestPost(context) {
 
   let llmResponse
   try {
-    llmResponse = await fetch('https://ark.cn-beijing.volces.com/api/v3/chat/completions', {
+    llmResponse = await fetch('https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
