@@ -45,7 +45,7 @@
 | 前端 | React + Vite + Monaco Editor | 现有技术栈，新增编辑器组件 |
 | 后端 | Cloudflare Workers | API 层，调用 LLM，处理认证和 CRUD |
 | 数据库 | Cloudflare D1（SQLite） | 存储用户账户和已发布 manifest |
-| LLM | 火山引擎豆包 API（OpenAI 兼容） | 已采购订阅，成本可控 |
+| LLM | 火山引擎豆包 API（OpenAI 兼容） | 已采购订阅，成本可控；API key 存为 Cloudflare Workers Secret |
 | 认证 | GitHub OAuth | 开发者用户天然有 GitHub 账号 |
 | 验证 | 纯前端 JSON Schema + 自定义规则 | 无需后端，响应即时 |
 | 部署 | Cloudflare Pages（前端）+ Workers（后端） | 全在 Cloudflare 生态，成本极低 |
@@ -147,8 +147,8 @@ code changes and provide constructive, actionable feedback.
 ### 阶段 2：Edit
 
 双栏布局：
-- **左栏**：结构化表单，每个 section 独立编辑区域，降低新手门槛
-- **右栏**：Monaco Editor 显示 markdown 原文，与左栏双向实时同步
+- **右栏（主）**：Monaco Editor 为唯一真相来源，存储完整 markdown 原文
+- **左栏（辅）**：结构化表单，解析 Monaco 内容渲染；表单字段修改后写回 Monaco markdown，不存在独立状态
 
 ### 阶段 3：Validate
 
