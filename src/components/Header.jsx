@@ -8,9 +8,11 @@ const Header = () => {
         <nav>
           <Link to="/" className="logo">Agent OS</Link>
           <ul className="nav-links">
-            <li><Link to="/">首页</Link></li>
-            <li><Link to="/navigation">资源导航</Link></li>
-            <li><Link to="/blog">博客</Link></li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/spec">Spec</Link></li>
+            <li><Link to="/studio">Studio</Link></li>
+            <li><Link to="/navigation">Resources</Link></li>
+            <li><Link to="/blog">Blog</Link></li>
           </ul>
         </nav>
       </div>
