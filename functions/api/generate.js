@@ -44,7 +44,15 @@ export async function onRequestPost(context) {
   const model = env.VOLCENGINE_MODEL
 
   if (!apiKey || !model) {
-    return new Response(JSON.stringify({ error: 'LLM not configured on server' }), {
+    return new Response(JSON.stringify({
+      error: 'LLM not configured on server',
+      debug: {
+        hasApiKey: !!apiKey,
+        hasModel: !!model,
+        apiKeyLength: apiKey ? apiKey.length : 0,
+        modelValue: model || null,
+      }
+    }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' },
     })
