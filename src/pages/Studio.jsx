@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import GeneratePanel from '../components/studio/GeneratePanel'
 import EditPanel from '../components/studio/EditPanel'
+import ValidatePanel from '../components/studio/ValidatePanel'
+import ExportPanel from '../components/studio/ExportPanel'
 
 const PHASES = ['generate', 'edit', 'validate', 'export']
 
@@ -40,6 +42,12 @@ export default function Studio() {
           )}
           {phase === 'edit' && (
             <EditPanel markdown={markdown} onChange={setMarkdown} />
+          )}
+          {phase === 'validate' && (
+            <ValidatePanel markdown={markdown} />
+          )}
+          {phase === 'export' && (
+            <ExportPanel markdown={markdown} />
           )}
         </section>
       </div>
