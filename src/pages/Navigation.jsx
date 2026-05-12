@@ -4,69 +4,69 @@ const Navigation = () => {
   const resources = {
     'Tutorials & Docs': [
       {
-        name: 'Agent OS 开发入门指南',
-        description: '从零开始学习智能体操作系统开发，包含核心概念和基础教程',
+        name: 'Getting Started with Agent OS Development',
+        description: 'Learn agent OS development from scratch — core concepts and foundational tutorials',
         url: '#'
       },
       {
-        name: 'OpenClaw 官方文档',
-        description: 'OpenClaw智能体开发框架官方文档，最全的API参考和示例',
+        name: 'OpenClaw Official Documentation',
+        description: 'Official docs for the OpenClaw agent development framework — full API reference and examples',
         url: 'https://docs.openclaw.ai'
       },
       {
-        name: 'Agent 工作流设计最佳实践',
-        description: '智能体工作流设计的经验总结和最佳实践指南',
+        name: 'Agent Workflow Design Best Practices',
+        description: 'Lessons learned and best practices for designing intelligent agent workflows',
         url: '#'
       }
     ],
     'Open Source': [
       {
         name: 'Awesome Agent OS',
-        description: '最全的Agent OS相关开源项目汇总，持续更新中',
+        description: 'The most comprehensive curated list of Agent OS open-source projects, continuously updated',
         url: 'https://github.com/agentos/awesome-agent-os'
       },
       {
         name: 'Agent SDK Collections',
-        description: '主流编程语言的Agent开发SDK集合，支持Python、JavaScript、Go等',
+        description: 'Agent development SDKs for major languages — Python, JavaScript, Go and more',
         url: '#'
       },
       {
         name: 'Agent Benchmark',
-        description: '智能体性能基准测试工具集，帮助评估不同Agent OS的性能',
+        description: 'Agent performance benchmarking toolkit for evaluating different Agent OS implementations',
         url: '#'
       }
     ],
     'Community': [
       {
-        name: 'Agent OS Discord 社区',
-        description: '全球最大的Agent OS开发者社区，交流技术、分享经验',
+        name: 'Agent OS Discord Community',
+        description: 'The global Agent OS developer community — discuss techniques, share experiences',
         url: 'https://discord.gg/agentos'
       },
       {
-        name: 'Agent 开发者论坛',
-        description: '中文Agent开发者社区，专注于智能体技术交流',
+        name: 'Agent Developer Forum',
+        description: 'Developer community focused on agent technology discussion',
         url: '#'
       },
       {
-        name: '每周Agent技术周报',
-        description: '订阅每周最新的Agent技术动态和行业资讯',
+        name: 'Weekly Agent Tech Newsletter',
+        description: 'Subscribe to the latest weekly Agent technology news and industry updates',
         url: '#'
       }
     ],
     'Dev Tools': [
       {
         name: 'Agent Studio',
-        description: '可视化Agent开发IDE，支持拖拽式工作流设计',
+        description: 'Visual agent development IDE with drag-and-drop workflow design',
         url: '#'
       },
       {
         name: 'Agent Debugger',
-        description: '智能体调试工具，帮助定位Agent运行时问题',
+        description: 'Agent debugging tool for tracing issues in agent runtime behavior',
         url: '#'
       },
       {
         name: 'Agent Simulator',
-        description: '智能体行为模拟器，在虚拟环境中测试Agent性能',
+        description: 'Agent behavior simulator for testing agent performance in virtual environments',
         url: '#'
       }
     ]
