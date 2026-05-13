@@ -47,5 +47,41 @@ export function exportManifest(manifest, platform) {
     ).trimEnd() + '\n'
   }
 
+  if (platform === 'hermes') {
+    return (
+      HEADER + meta +
+      section('Identity', sections.Role) +
+      section('Capabilities', sections.Capabilities) +
+      section('Behavioral Boundaries', sections.Constraints) +
+      section('Tools', sections.Tools) +
+      section('Operational Workflow', sections.Workflow)
+    ).trimEnd() + '\n'
+  }
+
+  if (platform === 'cursor') {
+    const { name, description } = frontmatter
+    const fmDesc = [name, description].filter(Boolean).join(' — ')
+    const fm = `---\ndescription: ${fmDesc}\nglobs: **/*\n---\n\n`
+    const roleText = sections.Role ? sections.Role.trim() + '\n\n' : ''
+    return (
+      fm + roleText +
+      section('Capabilities', sections.Capabilities) +
+      section('Constraints', sections.Constraints) +
+      section('Tools', sections.Tools) +
+      section('Workflow', sections.Workflow)
+    ).trimEnd() + '\n'
+  }
+
+  if (platform === 'windsurf') {
+    const roleText = sections.Role ? sections.Role.trim() + '\n\n' : ''
+    return (
+      HEADER + meta + roleText +
+      section('Capabilities', sections.Capabilities) +
+      section('Constraints', sections.Constraints) +
+      section('Tools', sections.Tools) +
+      section('Workflow', sections.Workflow)
+    ).trimEnd() + '\n'
+  }
+
   throw new Error(`Unknown platform: ${platform}`)
 }
