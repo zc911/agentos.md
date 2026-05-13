@@ -1,5 +1,5 @@
 // functions/api/templates.js
-import { verifyJWT } from './_jwt.js'
+import { verifyJWT } from '../_jwt.js'
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
