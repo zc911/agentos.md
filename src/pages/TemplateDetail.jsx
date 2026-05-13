@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getUser, getToken } from '../lib/auth.js'
+import { PLATFORMS } from '../lib/manifest/schema'
+import { parseManifest } from '../lib/manifest/parser'
+import { exportManifest } from '../lib/manifest/exporter'
 
 function relativeDate(unixSec) {
   const diff = Math.floor(Date.now() / 1000) - unixSec
@@ -22,6 +25,7 @@ export default function TemplateDetail() {
   const [copied, setCopied] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [selectedPlatform, setSelectedPlatform] = useState('claude')
 
   const currentUser = getUser()
   const isOwner = currentUser && template && template.user_id === currentUser.sub
@@ -47,12 +51,17 @@ export default function TemplateDetail() {
 
   function handleDownload() {
     fetch(`/api/templates/${templateId}`, { method: 'POST' }).catch(() => {})
-    const blob = new Blob([template.markdown], { type: 'text/markdown' })
+    const manifest = parseManifest(template.markdown)
+    const content = exportManifest(manifest, selectedPlatform)
+    const filename = PLATFORMS[selectedPlatform].filename
+    const blob = new Blob([content], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${template.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`
+    a.download = filename
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
@@ -149,8 +158,33 @@ export default function TemplateDetail() {
             </div>
           )}
 
-          {/* Action bar */}
-          <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          {/* Platform selector + Action bar */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Download as</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
+              {Object.entries(PLATFORMS).map(([key, { label, filename }]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedPlatform(key)}
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    background: selectedPlatform === key ? 'rgba(88,166,255,0.12)' : 'var(--bg-secondary)',
+                    border: `1px solid ${selectedPlatform === key ? 'var(--accent)' : 'var(--border)'}`,
+                    borderRadius: '6px',
+                    color: selectedPlatform === key ? 'var(--accent)' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                    fontWeight: selectedPlatform === key ? '600' : '400',
+                  }}
+                >
+                  {label}
+                  <span style={{ marginLeft: '0.4rem', fontFamily: 'monospace', opacity: 0.7, fontSize: '0.75rem' }}>
+                    {filename}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button
               onClick={handleCopy}
               style={{
@@ -169,15 +203,15 @@ export default function TemplateDetail() {
               onClick={handleDownload}
               style={{
                 padding: '0.5rem 1rem',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
+                background: 'var(--accent)',
+                border: 'none',
                 borderRadius: '8px',
-                color: 'var(--text-primary)',
+                color: 'white',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
               }}
             >
-              Download
+              Download {PLATFORMS[selectedPlatform].filename}
             </button>
             <button
               onClick={handleOpenInStudio}
@@ -260,6 +294,7 @@ export default function TemplateDetail() {
                 )}
               </>
             )}
+            </div>
           </div>
 
           {/* Manifest */}
