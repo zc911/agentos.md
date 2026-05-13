@@ -7,6 +7,8 @@ import Navigation from './pages/Navigation'
 import Blog from './pages/Blog'
 import Studio from './pages/Studio'
 import Spec from './pages/Spec'
+import Templates from './pages/Templates'
+import TemplateDetail from './pages/TemplateDetail'
 
 function App() {
   return (
@@ -18,6 +20,9 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/studio" element={<Studio />} />
         <Route path="/spec" element={<Spec />} />
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/templates/:id" element={<TemplateDetail />} />
+        <Route path="/templates/:username/:slug" element={<TemplateDetail />} />
       </Routes>
       <Footer />
     </Router>
