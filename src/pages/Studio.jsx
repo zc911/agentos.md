@@ -5,36 +5,107 @@ import ValidatePanel from '../components/studio/ValidatePanel'
 import ExportPanel from '../components/studio/ExportPanel'
 
 const PHASES = ['generate', 'edit', 'validate', 'export']
+const PHASE_LABELS = ['Generate', 'Edit', 'Validate', 'Export']
 
 export default function Studio() {
   const [markdown, setMarkdown] = useState('')
   const [phase, setPhase] = useState('generate')
 
+  const currentIdx = PHASES.indexOf(phase)
+
+  function handleStartOver() {
+    setMarkdown('')
+    setPhase('generate')
+  }
+
   return (
     <main>
       <div className="container">
         <section className="section">
-          <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Agent Manifest Studio</h1>
-
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-            {PHASES.map(p => (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <h1 style={{ margin: 0 }}>Agent Manifest Studio</h1>
+            {markdown && (
               <button
-                key={p}
-                onClick={() => (markdown || p === 'generate') && setPhase(p)}
+                onClick={handleStartOver}
                 style={{
-                  background: phase === p ? 'var(--accent)' : 'transparent',
-                  color: phase === p ? 'white' : 'var(--text-secondary)',
+                  background: 'transparent',
                   border: 'none',
-                  borderRadius: '6px',
-                  padding: '0.5rem 1.25rem',
-                  cursor: markdown || p === 'generate' ? 'pointer' : 'not-allowed',
-                  textTransform: 'capitalize',
-                  fontWeight: phase === p ? '600' : '400',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  padding: '0.25rem 0.5rem',
                 }}
               >
-                {p}
+                ↺ Start Over
               </button>
-            ))}
+            )}
+          </div>
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '2rem',
+            borderBottom: '1px solid var(--border)',
+            paddingBottom: '1rem',
+            flexWrap: 'wrap',
+            gap: '0.25rem',
+          }}>
+            {PHASES.map((p, idx) => {
+              const isCompleted = markdown && idx < currentIdx
+              const isCurrent = idx === currentIdx
+              const isReachable = !!(markdown || idx === 0)
+              return (
+                <React.Fragment key={p}>
+                  <button
+                    onClick={() => isReachable && setPhase(p)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: isReachable ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '6px',
+                    }}
+                  >
+                    <span style={{
+                      width: '1.5rem',
+                      height: '1.5rem',
+                      borderRadius: '50%',
+                      background: isCurrent
+                        ? 'var(--accent)'
+                        : isCompleted
+                          ? 'var(--success)'
+                          : 'var(--bg-tertiary)',
+                      color: 'white',
+                      fontSize: '0.72rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: '700',
+                      flexShrink: 0,
+                    }}>
+                      {isCompleted ? '✓' : idx + 1}
+                    </span>
+                    <span style={{
+                      color: isCurrent
+                        ? 'var(--text-primary)'
+                        : isCompleted
+                          ? 'var(--success)'
+                          : 'var(--text-secondary)',
+                      fontWeight: isCurrent ? '600' : '400',
+                      fontSize: '0.9rem',
+                    }}>
+                      {PHASE_LABELS[idx]}
+                    </span>
+                  </button>
+                  {idx < PHASES.length - 1 && (
+                    <span style={{ color: 'var(--border)', fontSize: '0.85rem', userSelect: 'none' }}>──</span>
+                  )}
+                </React.Fragment>
+              )
+            })}
           </div>
 
           {phase === 'generate' && (
