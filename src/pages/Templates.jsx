@@ -30,14 +30,14 @@ export default function Templates() {
       .catch(() => {})
   }, [])
 
-  const loadTemplates = useCallback(async (reset = true) => {
+  const loadTemplates = useCallback(async (reset = true, cursorValue = null) => {
     setLoading(true)
     setError('')
     try {
       const params = new URLSearchParams()
       if (q) params.set('q', q)
       if (activeTag) params.set('tags', activeTag)
-      if (!reset && nextCursor) params.set('cursor', String(nextCursor))
+      if (!reset && cursorValue) params.set('cursor', String(cursorValue))
       const res = await fetch(`/api/templates?${params}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to load')
@@ -48,7 +48,7 @@ export default function Templates() {
     } finally {
       setLoading(false)
     }
-  }, [q, activeTag, nextCursor])
+  }, [q, activeTag])
 
   // Reload when filters change
   useEffect(() => {
@@ -58,10 +58,10 @@ export default function Templates() {
         activeTag ? p.set('tags', activeTag) : p.delete('tags')
         return p
       }, { replace: true })
-      loadTemplates(true)
+      loadTemplates(true, null)
     }, q ? 300 : 0)
     return () => clearTimeout(timer)
-  }, [q, activeTag]) // eslint-disable-line
+  }, [q, activeTag, setSearchParams, loadTemplates])
 
   function cardHref(t) {
     return `/templates/${t.id}`
@@ -192,7 +192,7 @@ export default function Templates() {
           {nextCursor && (
             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
               <button
-                onClick={() => loadTemplates(false)}
+                onClick={() => loadTemplates(false, nextCursor)}
                 disabled={loading}
                 style={{
                   padding: '0.6rem 1.5rem',
