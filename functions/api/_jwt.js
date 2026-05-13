@@ -4,7 +4,7 @@ const DEC = new TextDecoder()
 
 function b64url(buf) {
   let str = ''
-  const bytes = new Uint8Array(buf instanceof ArrayBuffer ? buf : buf)
+  const bytes = new Uint8Array(buf)
   for (let i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i])
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }
