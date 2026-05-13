@@ -17,6 +17,11 @@ const Footer = () => {
             <p><a href="/blog">Blog</a></p>
           </div>
           <div className="footer-section">
+            <h3>Friends</h3>
+            <p><a href="https://clawhub.md" target="_blank" rel="noopener noreferrer">clawhub.md</a></p>
+            <p><a href="https://vlm.md" target="_blank" rel="noopener noreferrer">vlm.md</a></p>
+          </div>
+          <div className="footer-section">
             <h3>Contact</h3>
             <p>Email: <a href="mailto:zack.mm.chen@gmail.com">zack.mm.chen@gmail.com</a></p>
             <p>Twitter: @AgentOS_org</p>
