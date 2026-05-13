@@ -30,12 +30,29 @@ export async function onRequestGet(context) {
 
   if (!row) return json({ error: 'Not found' }, 404)
 
-  // Increment downloads
-  await env.DB.prepare(`UPDATE templates SET downloads = downloads + 1 WHERE id = ?`).bind(id).run()
-
   let tags = []
   try { tags = JSON.parse(row.tags) } catch {}
   return json({ ...row, tags })
+}
+
+export async function onRequestPost(context) {
+  const { env } = context
+  const id = resolveId(context)
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+  try {
+    await env.DB.prepare(`UPDATE templates SET downloads = downloads + 1 WHERE id = ?`).bind(id).run()
+    return new Response(null, { status: 204 })
+  } catch {
+    return new Response(JSON.stringify({ error: 'Internal error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 }
 
 export async function onRequestPut(context) {

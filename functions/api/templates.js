@@ -46,13 +46,13 @@ export async function onRequestGet(context) {
   const tagList = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : []
 
   let sql = `SELECT id, user_id, username, name, description, tags, downloads, created_at
-    FROM templates
+    FROM templates t
     WHERE (? = '' OR name LIKE ? OR description LIKE ?)`
   const params = [q, `%${q}%`, `%${q}%`]
 
   for (const tag of tagList) {
-    sql += ` AND tags LIKE ?`
-    params.push(`%"${tag}"%`)
+    sql += ` AND EXISTS (SELECT 1 FROM json_each(t.tags) je WHERE je.value = ?)`
+    params.push(tag)
   }
 
   if (cursor) {
@@ -112,7 +112,16 @@ export async function onRequestPost(context) {
     }
 
     return json({ id, url: `/templates/${id}` }, 201)
-  } catch {
-    return json({ error: 'Failed to create template' }, 500)
+  } catch (err) {
+    if (err.message && err.message.includes('UNIQUE constraint failed')) {
+      return new Response(JSON.stringify({ error: 'A template with this name already exists' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+    return new Response(JSON.stringify({ error: 'Internal error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

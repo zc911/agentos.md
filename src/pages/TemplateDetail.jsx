@@ -46,6 +46,7 @@ export default function TemplateDetail() {
   }
 
   function handleDownload() {
+    fetch(`/api/templates/${templateId}`, { method: 'POST' }).catch(() => {})
     const blob = new Blob([template.markdown], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

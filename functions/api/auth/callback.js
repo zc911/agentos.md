@@ -15,6 +15,17 @@ export async function onRequestGet(context) {
     return Response.redirect(`${origin}/studio?auth_error=1`, 302)
   }
 
+  const stateParam = url.searchParams.get('state')
+  const stateCookie = (request.headers.get('Cookie') || '')
+    .split(';')
+    .map(c => c.trim())
+    .find(c => c.startsWith('oauth_state='))
+    ?.split('=')[1]
+
+  if (!stateParam || !stateCookie || stateParam !== stateCookie) {
+    return Response.redirect(`${origin}/studio?auth_error=1`, 302)
+  }
+
   try {
     // Exchange code for access token
     const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
@@ -64,7 +75,13 @@ export async function onRequestGet(context) {
       env.JWT_SECRET
     )
 
-    return Response.redirect(`${origin}/studio?token=${jwt}`, 302)
+    return new Response(null, {
+      status: 302,
+      headers: {
+        'Location': `${origin}/studio#token=${jwt}`,
+        'Set-Cookie': 'oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0',
+      },
+    })
   } catch {
     return Response.redirect(`${origin}/studio?auth_error=1`, 302)
   }

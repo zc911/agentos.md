@@ -20,7 +20,8 @@ export default function Studio() {
     return sessionStorage.getItem('studio_pre_auth_phase') || 'generate'
   })
   const [editingId, setEditingId] = useState(() => {
-    return sessionStorage.getItem('studio_editing_id') || null
+    return sessionStorage.getItem('studio_editing_id') ||
+           sessionStorage.getItem('studio_pre_auth_editing_id') || null
   })
   const [authToken, setAuthToken] = useState(() => getToken())
   const [authError, setAuthError] = useState('')
@@ -35,17 +36,21 @@ export default function Studio() {
     sessionStorage.removeItem('studio_editing_id')
     sessionStorage.removeItem('studio_pre_auth_markdown')
     sessionStorage.removeItem('studio_pre_auth_phase')
+    sessionStorage.removeItem('studio_pre_auth_editing_id')
 
-    // Handle OAuth return via URL token
+    // Handle OAuth return via URL token (delivered via fragment to avoid server logs)
+    const hash = window.location.hash.slice(1)
+    const hashParams = new URLSearchParams(hash)
     const params = new URLSearchParams(window.location.search)
-    const token = params.get('token')
+    const token = hashParams.get('token')
     const authErr = params.get('auth_error')
 
     if (token) {
       setToken(token)
       setAuthToken(token)
-      params.delete('token')
-      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '')
+      hashParams.delete('token')
+      const cleanHash = hashParams.toString() ? '#' + hashParams.toString() : ''
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + cleanHash
       window.history.replaceState({}, '', clean)
     }
 
@@ -66,6 +71,7 @@ export default function Studio() {
   function handleAuthNeeded(currentMarkdown) {
     sessionStorage.setItem('studio_pre_auth_markdown', currentMarkdown)
     sessionStorage.setItem('studio_pre_auth_phase', 'export')
+    if (editingId) sessionStorage.setItem('studio_pre_auth_editing_id', editingId)
     window.location.href = '/api/auth/github'
   }
 
