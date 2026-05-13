@@ -7,6 +7,10 @@ export async function onRequestGet(context) {
   const code = url.searchParams.get('code')
   const origin = url.origin
 
+  if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET || !env.JWT_SECRET) {
+    return Response.redirect(`${origin}/studio?auth_error=1`, 302)
+  }
+
   if (!code) {
     return Response.redirect(`${origin}/studio?auth_error=1`, 302)
   }
@@ -38,7 +42,7 @@ export async function onRequestGet(context) {
       },
     })
     const ghUser = await userRes.json()
-    if (!ghUser.id) {
+    if (!ghUser.id || !ghUser.login) {
       return Response.redirect(`${origin}/studio?auth_error=1`, 302)
     }
 
