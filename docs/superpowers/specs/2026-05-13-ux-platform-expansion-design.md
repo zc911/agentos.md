@@ -1,0 +1,239 @@
+# UX Polish + Platform Expansion — Design Spec
+
+**Date:** 2026-05-13
+**Status:** Approved
+**Author:** zack
+
+---
+
+## Overview
+
+Phase 1.5 — polish the existing site and expand platform coverage.
+
+Three areas of change:
+
+1. **Homepage** — rewrite to reflect the Agent Manifest Standard mission; add prominent Studio entry point
+2. **Studio UX** — replace tab bar with a numbered step indicator; add quick-start chips; improve Edit layout
+3. **Export platforms** — add Hermes/OpenClaw (`SOUL.md`), Cursor (`agent.mdc`), Windsurf (`.windsurfrules`) to the existing Claude/OpenAI/Gemini set
+
+---
+
+## Area 1: Homepage
+
+### What changes
+
+Remove the old "Agent OS Landscape" content (project card grid + "What is Agent OS?" section). Replace with content that matches the current mission.
+
+### New layout (top to bottom)
+
+**Hero**
+
+```
+Write Once, Run on Any AI Agent
+
+Agent Manifest Standard — one open format that exports to
+Claude, Gemini, Hermes, OpenClaw, Cursor, Windsurf and more.
+
+[Open Studio →]   [Read the Spec]
+```
+
+Primary CTA links to `/studio`. Secondary CTA (outlined style) links to `/spec`.
+
+**Platform compatibility row**
+
+Horizontal row of badge chips, each showing `Platform · filename`:
+
+- Claude · CLAUDE.md
+- Gemini · GEMINI.md
+- Hermes · SOUL.md
+- OpenClaw · SOUL.md
+- Cursor · .cursor/rules
+- Windsurf · .windsurfrules
+- AGENTS.md · 10+ tools
+
+**3-step workflow cards**
+
+Three cards in a horizontal grid:
+
+| ① Generate | ② Edit & Validate | ③ Export |
+|---|---|---|
+| Describe your agent in plain language, AI writes the draft. | Monaco editor + instant error checking across all sections. | Pick a platform, download the ready-to-use file. |
+
+**Manifest example code block**
+
+Dark `<pre>` block showing a short manifest snippet (frontmatter + Role + Capabilities). Top-right corner: "Open in Studio →" link that navigates to `/studio`.
+
+### Files affected
+
+- `src/pages/Home.jsx` — full rewrite
+
+---
+
+## Area 2: Studio UX
+
+### Step indicator (replaces tab bar)
+
+Replace the four bare tab buttons with a numbered step indicator:
+
+```
+① Generate  ──►  ② Edit  ──►  ③ Validate  ──►  ④ Export
+```
+
+- Current step: accent color, bold
+- Completed steps: green checkmark (✓), clickable (can jump back)
+- Future steps: muted, not clickable until reached
+- Right side of the indicator row: "↺ Start Over" link, visible only when `markdown` is non-empty. Clicking resets `markdown` to `''` and returns to step 1 (no confirmation needed — the Generate panel is always accessible).
+
+### Generate panel — quick-start chips
+
+Below the textarea, add a row of 4 example chips. Clicking a chip fills the textarea with that description (does not auto-submit):
+
+- `Code reviewer for GitHub PRs`
+- `Customer support agent`
+- `Data analysis agent`
+- `API documentation writer`
+
+### Edit panel — layout
+
+Change from a strict 50/50 grid to:
+
+- **Form sidebar**: fixed 300px width, collapsible
+- **Monaco editor**: fills remaining width
+- A `⟨` / `⟩` toggle button on the form panel header collapses/expands the sidebar
+- When collapsed, Monaco is full-width
+
+No other changes to form fields or Monaco options.
+
+### Files affected
+
+- `src/pages/Studio.jsx` — step indicator + Start Over button
+- `src/components/studio/GeneratePanel.jsx` — example chips
+- `src/components/studio/EditPanel.jsx` — collapsible sidebar layout
+
+---
+
+## Area 3: Export Platform Expansion
+
+### New platform list
+
+```js
+// src/lib/manifest/schema.js
+export const PLATFORMS = {
+  claude:   { label: 'Claude',          filename: 'CLAUDE.md',      note: null },
+  openai:   { label: 'AGENTS.md',       filename: 'AGENTS.md',      note: null },
+  gemini:   { label: 'Gemini',          filename: 'GEMINI.md',      note: null },
+  hermes:   { label: 'Hermes/OpenClaw', filename: 'SOUL.md',        note: null },
+  cursor:   { label: 'Cursor',          filename: 'agent.mdc',      note: 'Place in .cursor/rules/' },
+  windsurf: { label: 'Windsurf',        filename: '.windsurfrules', note: 'Place in project root' },
+}
+```
+
+### Content mapping for new platforms
+
+**`SOUL.md` (Hermes + OpenClaw)**
+
+Personality-first format. Section names are remapped to match the SOUL.md convention:
+
+| Manifest section | SOUL.md section |
+|---|---|
+| Role | `## Identity` |
+| Capabilities | `## Capabilities` |
+| Constraints | `## Behavioral Boundaries` |
+| Tools | `## Tools` |
+| Workflow | `## Operational Workflow` |
+| Memory | (omitted — not used in SOUL.md) |
+
+**`agent.mdc` (Cursor)**
+
+YAML frontmatter + markdown body. No fixed H2 section names required; use manifest section names as-is.
+
+```markdown
+---
+description: [agent name] — [agent description]
+globs: **/*
+---
+
+[Role content as opening paragraph]
+
+## Capabilities
+
+[Capabilities content]
+
+## Constraints
+
+[Constraints content]
+
+## Tools
+
+[Tools content]
+
+## Workflow
+
+[Workflow content]
+```
+
+**`.windsurfrules` (Windsurf)**
+
+Plain markdown, no frontmatter. Role content becomes the opening paragraph (no heading), remaining sections use manifest names.
+
+```markdown
+<!-- Generated by agentos.md — Agent Manifest Standard v0.1 -->
+<!-- Agent: [name] v[version] -->
+
+[Role content — no heading, becomes opening instruction paragraph]
+
+## Capabilities
+
+[Capabilities content]
+
+## Constraints
+
+[Constraints content]
+
+## Tools
+
+[Tools content]
+
+## Workflow
+
+[Workflow content]
+```
+
+### Export panel UI
+
+Replace the horizontal button row with a **2×3 card grid**. Each card shows:
+
+- Platform label (bold)
+- Output filename (muted, monospace)
+- Placement note (small, muted) — only for Cursor and Windsurf
+
+Selected card has accent border. Clicking selects it and updates the preview.
+
+### Files affected
+
+- `src/lib/manifest/schema.js` — add 3 new platforms with `note` field
+- `src/lib/manifest/exporter.js` — add `hermes`, `cursor`, `windsurf` branches
+- `src/lib/manifest/exporter.test.js` — snapshot tests for 3 new platforms
+- `src/components/studio/ExportPanel.jsx` — card grid layout, show placement note
+
+---
+
+## Error handling
+
+No new error cases. The `exportManifest` function already throws on unknown platform — the new platforms are simply new branches in the existing switch structure.
+
+## Testing
+
+- **Exporter**: add snapshot tests for `hermes`, `cursor`, `windsurf` platforms (each with a full manifest fixture and an empty-sections fixture)
+- **Schema**: no new tests needed (constants only)
+- **UI**: manual verification of step indicator state transitions; platform card selection; collapse/expand sidebar
+
+## Implementation priority
+
+1. `schema.js` — add platform definitions (unblocks exporter and UI)
+2. `exporter.js` + tests — new platform logic
+3. `ExportPanel.jsx` — card grid
+4. `Studio.jsx` — step indicator + Start Over
+5. `GeneratePanel.jsx` — example chips
+6. `EditPanel.jsx` — collapsible sidebar
+7. `Home.jsx` — full rewrite
