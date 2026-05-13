@@ -37,22 +37,41 @@ export default function ExportPanel({ markdown }) {
       )}
 
       <p style={{ color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>Export as</p>
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem' }}>
-        {Object.entries(PLATFORMS).map(([key, { label }]) => (
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '0.75rem',
+        marginBottom: '2rem',
+      }}>
+        {Object.entries(PLATFORMS).map(([key, { label, filename, note }]) => (
           <button
             key={key}
             onClick={() => setSelected(key)}
             style={{
-              padding: '0.6rem 1.25rem',
-              background: selected === key ? 'var(--accent)' : 'var(--bg-secondary)',
-              color: selected === key ? 'white' : 'var(--text-primary)',
-              border: '1px solid var(--border)',
+              padding: '0.75rem 1rem',
+              background: selected === key ? 'rgba(88,166,255,0.1)' : 'var(--bg-secondary)',
+              border: `1px solid ${selected === key ? 'var(--accent)' : 'var(--border)'}`,
               borderRadius: '8px',
               cursor: 'pointer',
-              fontWeight: selected === key ? '600' : '400',
+              textAlign: 'left',
             }}
           >
-            {label}
+            <div style={{
+              fontWeight: selected === key ? '600' : '400',
+              color: 'var(--text-primary)',
+              marginBottom: '0.2rem',
+              fontSize: '0.9rem',
+            }}>
+              {label}
+            </div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--accent)', fontFamily: 'monospace' }}>
+              {filename}
+            </div>
+            {note && (
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                {note}
+              </div>
+            )}
           </button>
         ))}
       </div>
