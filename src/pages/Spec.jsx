@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const EXAMPLE = `---
 name: Code Review Agent
@@ -47,6 +47,7 @@ const thStyle = { textAlign: 'left', padding: '0.75rem', color: 'var(--text-prim
 const tdStyle = { padding: '0.75rem', borderBottom: '1px solid var(--border)', color: 'var(--text-secondary)' }
 
 export default function Spec() {
+  useEffect(() => { document.title = 'Agent Manifest Spec v0.1 — agentos.md' }, [])
   return (
     <main>
       <div className="container">

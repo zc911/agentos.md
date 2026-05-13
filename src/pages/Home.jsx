@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const EXAMPLE_MANIFEST = `---
 name: Code Review Agent
@@ -53,6 +53,7 @@ const HOW_IT_WORKS = [
 ]
 
 export default function Home() {
+  useEffect(() => { document.title = 'agentos.md — Agent Manifest Standard' }, [])
   return (
     <>
       <section className="hero">

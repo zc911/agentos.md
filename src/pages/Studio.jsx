@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import GeneratePanel from '../components/studio/GeneratePanel'
 import EditPanel from '../components/studio/EditPanel'
 import ValidatePanel from '../components/studio/ValidatePanel'
@@ -12,6 +12,8 @@ export default function Studio() {
   const [phase, setPhase] = useState('generate')
 
   const currentIdx = PHASES.indexOf(phase)
+
+  useEffect(() => { document.title = 'Agent Manifest Studio — agentos.md' }, [])
 
   function handleStartOver() {
     setMarkdown('')

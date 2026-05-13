@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const Navigation = () => {
+  useEffect(() => { document.title = 'Resources — agentos.md' }, [])
   const resources = {
     'Tutorials & Docs': [
       {

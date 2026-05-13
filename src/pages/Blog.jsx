@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const Blog = () => {
+  useEffect(() => { document.title = 'Blog — agentos.md' }, [])
   const posts = [
     {
       title: '2026 Agent OS Industry Trends Report',
