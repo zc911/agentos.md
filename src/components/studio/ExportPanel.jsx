@@ -33,7 +33,7 @@ export default function ExportPanel({ markdown, authToken, editingId, authError,
   }, [markdown])
 
   // Decode user from token payload (no verification — just display)
-  const tokenUser = authToken ? getUser() : null
+  const tokenUser = getUser(authToken)
 
   function handleDownload() {
     const blob = new Blob([preview], { type: 'text/markdown' })

@@ -12,15 +12,13 @@ export function clearToken() {
   localStorage.removeItem(KEY)
 }
 
-export function getUser() {
-  const token = getToken()
-  if (!token) return null
+export function getUser(token) {
+  const tok = token !== undefined ? token : getToken()
+  if (!tok) return null
   try {
-    const part = token.split('.')[1]
+    const part = tok.split('.')[1]
     if (!part) return null
     const padded = part.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((part.length + 3) % 4)
     return JSON.parse(atob(padded))
-  } catch {
-    return null
-  }
+  } catch { return null }
 }
