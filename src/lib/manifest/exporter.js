@@ -61,7 +61,7 @@ export function exportManifest(manifest, platform) {
   if (platform === 'cursor') {
     const { name, description } = frontmatter
     const fmDesc = [name, description].filter(Boolean).join(' — ')
-    const fm = `---\ndescription: ${fmDesc}\nglobs: **/*\n---\n\n`
+    const fm = `---\ndescription: "${fmDesc.replace(/"/g, '\\"')}"\nglobs: **/*\n---\n\n`
     const roleText = sections.Role ? sections.Role.trim() + '\n\n' : ''
     return (
       fm + roleText +

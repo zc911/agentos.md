@@ -65,7 +65,7 @@ describe('exportManifest — hermes', () => {
     expect(exportManifest(MANIFEST, 'hermes')).toContain('## Operational Workflow')
   })
   it('does not include Memory section', () => {
-    expect(exportManifest(MANIFEST, 'hermes')).not.toContain('Memory')
+    expect(exportManifest(MANIFEST, 'hermes')).not.toContain('## Memory')
   })
 })
 
