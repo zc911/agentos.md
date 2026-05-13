@@ -1,15 +1,37 @@
+// src/components/studio/ExportPanel.jsx
 import React, { useState } from 'react'
 import { parseManifest } from '../../lib/manifest/parser'
 import { validateManifest } from '../../lib/manifest/validator'
 import { exportManifest } from '../../lib/manifest/exporter'
 import { PLATFORMS } from '../../lib/manifest/schema'
 
-export default function ExportPanel({ markdown }) {
+export default function ExportPanel({ markdown, authToken, editingId, authError, onAuthNeeded }) {
   const [selected, setSelected] = useState('claude')
   const manifest = parseManifest(markdown)
   const errors = validateManifest(manifest).filter(i => i.level === 'error')
   const hasErrors = errors.length > 0
   const preview = hasErrors ? '' : exportManifest(manifest, selected)
+
+  // Publish state — pre-fill from frontmatter
+  const fm = manifest.frontmatter
+  const [pubName, setPubName] = useState(fm.name || '')
+  const [pubDesc, setPubDesc] = useState(fm.description || '')
+  const [pubTags, setPubTags] = useState(
+    Array.isArray(fm.tags) ? fm.tags.join(', ') : (fm.tags || '')
+  )
+  const [publishing, setPublishing] = useState(false)
+  const [publishResult, setPublishResult] = useState(null)
+  const [publishError, setPublishError] = useState('')
+
+  // Decode user from token payload (no verification — just display)
+  let tokenUser = null
+  if (authToken) {
+    try {
+      const part = authToken.split('.')[1]
+      const padded = part.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((part.length + 3) % 4)
+      tokenUser = JSON.parse(atob(padded))
+    } catch {}
+  }
 
   function handleDownload() {
     const blob = new Blob([preview], { type: 'text/markdown' })
@@ -19,6 +41,49 @@ export default function ExportPanel({ markdown }) {
     a.download = PLATFORMS[selected].filename
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  async function handlePublish(withAuth) {
+    setPublishing(true)
+    setPublishError('')
+    try {
+      const headers = { 'Content-Type': 'application/json' }
+      if (withAuth && authToken) headers['Authorization'] = `Bearer ${authToken}`
+
+      const isEdit = withAuth && editingId
+      const url = isEdit ? `/api/templates/${editingId}` : '/api/templates'
+      const method = isEdit ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify({
+          name: pubName,
+          description: pubDesc,
+          tags: pubTags.split(',').map(t => t.trim()).filter(Boolean),
+          markdown,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Publish failed')
+      setPublishResult(data)
+    } catch (err) {
+      setPublishError(err.message)
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const inputStyle = {
+    width: '100%',
+    padding: '0.6rem 0.75rem',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border)',
+    borderRadius: '6px',
+    color: 'var(--text-primary)',
+    fontSize: '0.9rem',
+    boxSizing: 'border-box',
+    marginBottom: '0.75rem',
   }
 
   return (
@@ -56,12 +121,7 @@ export default function ExportPanel({ markdown }) {
               textAlign: 'left',
             }}
           >
-            <div style={{
-              fontWeight: selected === key ? '600' : '400',
-              color: 'var(--text-primary)',
-              marginBottom: '0.2rem',
-              fontSize: '0.9rem',
-            }}>
+            <div style={{ fontWeight: selected === key ? '600' : '400', color: 'var(--text-primary)', marginBottom: '0.2rem', fontSize: '0.9rem' }}>
               {label}
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--accent)', fontFamily: 'monospace' }}>
@@ -101,10 +161,124 @@ export default function ExportPanel({ markdown }) {
           borderRadius: '8px',
           fontSize: '1rem',
           cursor: hasErrors ? 'not-allowed' : 'pointer',
+          marginBottom: '2.5rem',
         }}
       >
         Download {PLATFORMS[selected]?.filename}
       </button>
+
+      {/* Publish to Gallery */}
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+        <h3 style={{ marginBottom: '1rem' }}>Publish to Gallery</h3>
+
+        {publishResult ? (
+          <div style={{
+            padding: '1rem',
+            background: 'rgba(63,185,80,0.1)',
+            border: '1px solid var(--success)',
+            borderRadius: '8px',
+          }}>
+            <p style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: '600' }}>
+              {editingId ? 'Updated!' : 'Published!'}
+            </p>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+              {window.location.origin}/templates/{publishResult.id}
+            </p>
+            <a
+              href={`/templates/${publishResult.id}`}
+              style={{ color: 'var(--accent)', fontSize: '0.9rem' }}
+            >
+              View in Gallery →
+            </a>
+          </div>
+        ) : (
+          <>
+            {authError && (
+              <p style={{ color: '#f87171', marginBottom: '0.75rem', fontSize: '0.88rem' }}>{authError}</p>
+            )}
+
+            <input
+              value={pubName}
+              onChange={e => setPubName(e.target.value)}
+              placeholder="Agent name"
+              style={inputStyle}
+            />
+            <input
+              value={pubDesc}
+              onChange={e => setPubDesc(e.target.value)}
+              placeholder="Short description"
+              style={inputStyle}
+            />
+            <input
+              value={pubTags}
+              onChange={e => setPubTags(e.target.value)}
+              placeholder="Tags (comma-separated)"
+              style={{ ...inputStyle, marginBottom: '1.25rem' }}
+            />
+
+            {publishError && (
+              <p style={{ color: '#f87171', marginBottom: '0.75rem', fontSize: '0.88rem' }}>{publishError}</p>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => handlePublish(false)}
+                disabled={publishing || !pubName.trim()}
+                style={{
+                  padding: '0.6rem 1.25rem',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  cursor: publishing || !pubName.trim() ? 'not-allowed' : 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >
+                {publishing ? 'Publishing...' : 'Publish Anonymously'}
+              </button>
+
+              {tokenUser ? (
+                <button
+                  onClick={() => handlePublish(true)}
+                  disabled={publishing || !pubName.trim()}
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    background: 'var(--accent)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: 'white',
+                    cursor: publishing || !pubName.trim() ? 'not-allowed' : 'pointer',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  {publishing ? 'Publishing...' : (editingId ? `Update as @${tokenUser.login}` : `Publish as @${tokenUser.login}`)}
+                </button>
+              ) : (
+                <button
+                  onClick={() => onAuthNeeded(markdown)}
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    background: 'transparent',
+                    border: '1px solid var(--accent)',
+                    borderRadius: '8px',
+                    color: 'var(--accent)',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  Sign in with GitHub →
+                </button>
+              )}
+            </div>
+
+            {!tokenUser && (
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                Anonymous templates cannot be edited after publishing.
+              </p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

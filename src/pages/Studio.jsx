@@ -1,23 +1,72 @@
+// src/pages/Studio.jsx
 import React, { useState, useEffect } from 'react'
 import GeneratePanel from '../components/studio/GeneratePanel'
 import EditPanel from '../components/studio/EditPanel'
 import ValidatePanel from '../components/studio/ValidatePanel'
 import ExportPanel from '../components/studio/ExportPanel'
+import { getToken, setToken } from '../lib/auth.js'
 
 const PHASES = ['generate', 'edit', 'validate', 'export']
 const PHASE_LABELS = ['Generate', 'Edit', 'Validate', 'Export']
 
 export default function Studio() {
-  const [markdown, setMarkdown] = useState('')
-  const [phase, setPhase] = useState('generate')
+  // Lazy init: restore from sessionStorage before first render
+  const [markdown, setMarkdown] = useState(() => {
+    return sessionStorage.getItem('studio_import') ||
+           sessionStorage.getItem('studio_pre_auth_markdown') || ''
+  })
+  const [phase, setPhase] = useState(() => {
+    if (sessionStorage.getItem('studio_import')) return 'edit'
+    return sessionStorage.getItem('studio_pre_auth_phase') || 'generate'
+  })
+  const [editingId, setEditingId] = useState(() => {
+    return sessionStorage.getItem('studio_editing_id') || null
+  })
+  const [authToken, setAuthToken] = useState(() => getToken())
+  const [authError, setAuthError] = useState('')
 
   const currentIdx = PHASES.indexOf(phase)
 
-  useEffect(() => { document.title = 'Agent Manifest Studio — agentos.md' }, [])
+  useEffect(() => {
+    document.title = 'Agent Manifest Studio — agentos.md'
+
+    // Clean up sessionStorage after reading
+    sessionStorage.removeItem('studio_import')
+    sessionStorage.removeItem('studio_editing_id')
+    sessionStorage.removeItem('studio_pre_auth_markdown')
+    sessionStorage.removeItem('studio_pre_auth_phase')
+
+    // Handle OAuth return via URL token
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+    const authErr = params.get('auth_error')
+
+    if (token) {
+      setToken(token)
+      setAuthToken(token)
+      params.delete('token')
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '')
+      window.history.replaceState({}, '', clean)
+    }
+
+    if (authErr) {
+      setAuthError('GitHub sign-in failed. Please try again.')
+      params.delete('auth_error')
+      const clean = window.location.pathname + (params.toString() ? '?' + params.toString() : '')
+      window.history.replaceState({}, '', clean)
+    }
+  }, [])
 
   function handleStartOver() {
     setMarkdown('')
     setPhase('generate')
+    setEditingId(null)
+  }
+
+  function handleAuthNeeded(currentMarkdown) {
+    sessionStorage.setItem('studio_pre_auth_markdown', currentMarkdown)
+    sessionStorage.setItem('studio_pre_auth_phase', 'export')
+    window.location.href = '/api/auth/github'
   }
 
   return (
@@ -75,11 +124,7 @@ export default function Studio() {
                       width: '1.5rem',
                       height: '1.5rem',
                       borderRadius: '50%',
-                      background: isCurrent
-                        ? 'var(--accent)'
-                        : isCompleted
-                          ? 'var(--success)'
-                          : 'var(--bg-tertiary)',
+                      background: isCurrent ? 'var(--accent)' : isCompleted ? 'var(--success)' : 'var(--bg-tertiary)',
                       color: 'white',
                       fontSize: '0.72rem',
                       display: 'flex',
@@ -91,11 +136,7 @@ export default function Studio() {
                       {isCompleted ? '✓' : idx + 1}
                     </span>
                     <span style={{
-                      color: isCurrent
-                        ? 'var(--text-primary)'
-                        : isCompleted
-                          ? 'var(--success)'
-                          : 'var(--text-secondary)',
+                      color: isCurrent ? 'var(--text-primary)' : isCompleted ? 'var(--success)' : 'var(--text-secondary)',
                       fontWeight: isCurrent ? '600' : '400',
                       fontSize: '0.9rem',
                     }}>
@@ -120,7 +161,13 @@ export default function Studio() {
             <ValidatePanel markdown={markdown} />
           )}
           {phase === 'export' && (
-            <ExportPanel markdown={markdown} />
+            <ExportPanel
+              markdown={markdown}
+              authToken={authToken}
+              editingId={editingId}
+              authError={authError}
+              onAuthNeeded={handleAuthNeeded}
+            />
           )}
         </section>
       </div>
