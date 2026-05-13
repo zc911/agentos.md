@@ -1,16 +1,17 @@
 // src/components/studio/ExportPanel.jsx
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { parseManifest } from '../../lib/manifest/parser'
 import { validateManifest } from '../../lib/manifest/validator'
 import { exportManifest } from '../../lib/manifest/exporter'
 import { PLATFORMS } from '../../lib/manifest/schema'
+import { getUser } from '../../lib/auth.js'
 
 export default function ExportPanel({ markdown, authToken, editingId, authError, onAuthNeeded }) {
   const [selected, setSelected] = useState('claude')
-  const manifest = parseManifest(markdown)
-  const errors = validateManifest(manifest).filter(i => i.level === 'error')
+  const manifest = useMemo(() => parseManifest(markdown), [markdown])
+  const errors   = useMemo(() => validateManifest(manifest).filter(i => i.level === 'error'), [manifest])
   const hasErrors = errors.length > 0
-  const preview = hasErrors ? '' : exportManifest(manifest, selected)
+  const preview  = useMemo(() => hasErrors ? '' : exportManifest(manifest, selected), [manifest, selected, hasErrors])
 
   // Publish state — pre-fill from frontmatter
   const fm = manifest.frontmatter
@@ -23,15 +24,16 @@ export default function ExportPanel({ markdown, authToken, editingId, authError,
   const [publishResult, setPublishResult] = useState(null)
   const [publishError, setPublishError] = useState('')
 
+  // Sync publish form fields when markdown changes, respecting deliberate user edits
+  useEffect(() => {
+    const fm = parseManifest(markdown).frontmatter
+    setPubName(prev => prev || fm.name || '')
+    setPubDesc(prev => prev || fm.description || '')
+    setPubTags(prev => prev || (Array.isArray(fm.tags) ? fm.tags.join(', ') : (fm.tags || '')))
+  }, [markdown])
+
   // Decode user from token payload (no verification — just display)
-  let tokenUser = null
-  if (authToken) {
-    try {
-      const part = authToken.split('.')[1]
-      const padded = part.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((part.length + 3) % 4)
-      tokenUser = JSON.parse(atob(padded))
-    } catch {}
-  }
+  const tokenUser = authToken ? getUser() : null
 
   function handleDownload() {
     const blob = new Blob([preview], { type: 'text/markdown' })
@@ -39,7 +41,9 @@ export default function ExportPanel({ markdown, authToken, editingId, authError,
     const a = document.createElement('a')
     a.href = url
     a.download = PLATFORMS[selected].filename
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
@@ -66,7 +70,7 @@ export default function ExportPanel({ markdown, authToken, editingId, authError,
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Publish failed')
-      setPublishResult(data)
+      setPublishResult({ ...data, wasEdit: !!editingId })
     } catch (err) {
       setPublishError(err.message)
     } finally {
@@ -179,7 +183,7 @@ export default function ExportPanel({ markdown, authToken, editingId, authError,
             borderRadius: '8px',
           }}>
             <p style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: '600' }}>
-              {editingId ? 'Updated!' : 'Published!'}
+              {publishResult.wasEdit ? 'Updated!' : 'Published!'}
             </p>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
               {window.location.origin}/templates/{publishResult.id}
