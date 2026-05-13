@@ -8,7 +8,7 @@ const LEVEL = {
   suggestion: { color: '#60a5fa', icon: '→', label: 'Suggestion' },
 }
 
-export default function ValidatePanel({ markdown }) {
+export default function ValidatePanel({ markdown, onNext }) {
   const issues = validateManifest(parseManifest(markdown))
   const counts = { error: 0, warning: 0, suggestion: 0 }
   issues.forEach(i => counts[i.level]++)
@@ -49,6 +49,28 @@ export default function ValidatePanel({ markdown }) {
           </div>
         )
       })}
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
+        {counts.error > 0 && (
+          <span style={{ fontSize: '0.85rem', color: '#f87171' }}>
+            {counts.error} error{counts.error !== 1 ? 's' : ''} — fix before publishing
+          </span>
+        )}
+        <button
+          onClick={onNext}
+          style={{
+            padding: '0.75rem 2rem',
+            background: 'var(--accent)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '1rem',
+            cursor: 'pointer',
+          }}
+        >
+          Proceed to Export →
+        </button>
+      </div>
     </div>
   )
 }

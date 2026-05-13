@@ -17,7 +17,7 @@ function buildMarkdown(frontmatter, sections) {
   return fmLines ? `---\n${fmLines}\n---\n\n${body}` : body
 }
 
-export default function EditPanel({ markdown, onChange }) {
+export default function EditPanel({ markdown, onChange, onNext }) {
   const [formOpen, setFormOpen] = useState(true)
   const parsed = parseManifest(markdown)
 
@@ -26,6 +26,7 @@ export default function EditPanel({ markdown, onChange }) {
   }, [onChange])
 
   return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
     <div style={{ display: 'flex', gap: '1rem', height: '70vh' }}>
       {formOpen && (
         <div style={{ width: '300px', flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -70,6 +71,24 @@ export default function EditPanel({ markdown, onChange }) {
           options={{ minimap: { enabled: false }, wordWrap: 'on', fontSize: 13 }}
         />
       </div>
+    </div>
+    <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
+      <button
+        onClick={onNext}
+        disabled={!markdown.trim()}
+        style={{
+          padding: '0.75rem 2rem',
+          background: markdown.trim() ? 'var(--accent)' : 'var(--bg-secondary)',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '1rem',
+          cursor: markdown.trim() ? 'pointer' : 'not-allowed',
+        }}
+      >
+        Next: Validate →
+      </button>
+    </div>
     </div>
   )
 }

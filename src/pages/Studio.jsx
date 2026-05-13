@@ -161,10 +161,10 @@ export default function Studio() {
             <GeneratePanel onGenerated={md => { setMarkdown(md); setPhase('edit') }} />
           )}
           {phase === 'edit' && (
-            <EditPanel markdown={markdown} onChange={setMarkdown} />
+            <EditPanel markdown={markdown} onChange={setMarkdown} onNext={() => setPhase('validate')} />
           )}
           {phase === 'validate' && (
-            <ValidatePanel markdown={markdown} />
+            <ValidatePanel markdown={markdown} onNext={() => setPhase('export')} />
           )}
           {phase === 'export' && (
             <ExportPanel
