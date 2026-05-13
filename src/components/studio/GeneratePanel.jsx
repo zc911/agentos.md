@@ -1,5 +1,12 @@
 import React, { useState } from 'react'
 
+const EXAMPLES = [
+  'Code reviewer for GitHub PRs — gives structured feedback on bugs, security, and style',
+  'Customer support agent for a SaaS product — handles questions, routes escalations',
+  'Data analysis agent that reads CSV files and produces summary reports',
+  'API documentation writer — reads source code and writes clear developer docs',
+]
+
 export default function GeneratePanel({ onGenerated }) {
   const [description, setDescription] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -48,7 +55,26 @@ export default function GeneratePanel({ onGenerated }) {
           boxSizing: 'border-box',
         }}
       />
-      {error && <p style={{ color: '#f87171', marginTop: '0.5rem' }}>{error}</p>}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
+        {EXAMPLES.map(ex => (
+          <button
+            key={ex}
+            onClick={() => setDescription(ex)}
+            style={{
+              padding: '0.3rem 0.75rem',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
+              borderRadius: '999px',
+              color: 'var(--text-secondary)',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            {ex.split(' — ')[0]}
+          </button>
+        ))}
+      </div>
+      {error && <p style={{ color: '#f87171', marginTop: '0.75rem' }}>{error}</p>}
       <button
         onClick={handleGenerate}
         disabled={isLoading || !description.trim()}
