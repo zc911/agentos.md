@@ -7,5 +7,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    setupFiles: ['./vitest.setup.js'],
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost',
+      },
+    },
   },
 })
