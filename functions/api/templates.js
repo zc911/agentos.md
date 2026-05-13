@@ -39,8 +39,9 @@ export async function onRequestGet(context) {
   const url = new URL(request.url)
   const q = url.searchParams.get('q') || ''
   const tags = url.searchParams.get('tags') || ''
-  const cursor = url.searchParams.get('cursor') ? parseInt(url.searchParams.get('cursor')) : null
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '24'), 48)
+  const cursorRaw = parseInt(url.searchParams.get('cursor') || '0')
+  const cursor = cursorRaw > 0 ? cursorRaw : null
+  const limit = Math.max(1, Math.min(parseInt(url.searchParams.get('limit') || '24') || 24, 48))
 
   const tagList = tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : []
 
@@ -68,7 +69,11 @@ export async function onRequestGet(context) {
   if (hasMore) rows.pop()
 
   return json({
-    templates: rows.map(r => ({ ...r, tags: JSON.parse(r.tags) })),
+    templates: rows.map(r => {
+      let tags = []
+      try { tags = JSON.parse(r.tags) } catch {}
+      return { ...r, tags }
+    }),
     nextCursor: hasMore ? rows[rows.length - 1].created_at : null,
   })
 }
@@ -90,20 +95,24 @@ export async function onRequestPost(context) {
   const tagsJson = JSON.stringify(tagsArr)
   const now = Math.floor(Date.now() / 1000)
 
-  let id
-  if (user) {
-    id = await uniqueSlug(env.DB, user.login, slugify(name))
-    await env.DB.prepare(
-      `INSERT INTO templates (id, user_id, username, name, description, tags, markdown, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(id, user.sub, user.login, name.trim(), description || '', tagsJson, markdown.trim(), now, now).run()
-  } else {
-    id = crypto.randomUUID()
-    await env.DB.prepare(
-      `INSERT INTO templates (id, user_id, username, name, description, tags, markdown, created_at, updated_at)
-       VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?)`
-    ).bind(id, name.trim(), description || '', tagsJson, markdown.trim(), now, now).run()
-  }
+  try {
+    let id
+    if (user) {
+      id = await uniqueSlug(env.DB, user.login, slugify(name))
+      await env.DB.prepare(
+        `INSERT INTO templates (id, user_id, username, name, description, tags, markdown, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(id, user.sub, user.login, name.trim(), description || '', tagsJson, markdown.trim(), now, now).run()
+    } else {
+      id = crypto.randomUUID()
+      await env.DB.prepare(
+        `INSERT INTO templates (id, user_id, username, name, description, tags, markdown, created_at, updated_at)
+         VALUES (?, NULL, NULL, ?, ?, ?, ?, ?, ?)`
+      ).bind(id, name.trim(), description || '', tagsJson, markdown.trim(), now, now).run()
+    }
 
-  return json({ id, url: `/templates/${id}` }, 201)
+    return json({ id, url: `/templates/${id}` }, 201)
+  } catch {
+    return json({ error: 'Failed to create template' }, 500)
+  }
 }
