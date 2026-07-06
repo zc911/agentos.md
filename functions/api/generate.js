@@ -40,8 +40,8 @@ license: MIT
 
 export async function onRequestPost(context) {
   const { request, env } = context
-  const apiKey = env.VOLCENGINE_API_KEY
-  const model = env.VOLCENGINE_MODEL
+  const apiKey = env.DEEPSEEK_API_KEY
+  const model = env.DEEPSEEK_MODEL
 
   if (!apiKey || !model) {
     return new Response(JSON.stringify({ error: 'LLM not configured on server' }), {
@@ -73,7 +73,7 @@ export async function onRequestPost(context) {
 
   let llmResponse
   try {
-    llmResponse = await fetch('https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions', {
+    llmResponse = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
